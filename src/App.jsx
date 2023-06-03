@@ -1,32 +1,55 @@
 import React, { useState } from 'react';
-import Axios from 'axios';
+import axios from 'axios';
 
 function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [zipcode, setZipCode] = useState('');
+  const [isFetching, setIsFetching] = useState(false);
 
   const weatherApp = () => {
-    const apiKey = '093c902130614d44a72bc29550dbae41';
-    const url = `https://api.openweathermap.org/data/2.5/weather?zip=${zipcode},us&appid=${apiKey}`;
+    
+    const apiKey = '093c902130614d44a72bc29550dbae41'; 
+    const url = `https://api.openweathermap.org/data/2.5/weather?zip=${zipcode}&appid=${apiKey}`;
 
-    Axios.get(url)
-      .then((res) => setWeatherData(res.data))
-      .catch((error) => console.log(error));
+
+    setIsFetching(true);
+
+    axios
+      .get(url)
+      .then((res) => {
+        setWeatherData(res.data);
+        setIsFetching(false);
+      })
+      .catch((error) => {
+        console.log(error);
+        setIsFetching(false);
+      });
   };
 
   const handleInputChange = (event) => {
-    setZipCode(event.target.value);
+    const input = event.target.value
+    const numericInput = input.replace(/\D/g);
+
+    setZipCode( numericInput )
   };
 
   return (
-    <div>
-      <input
-        type="text"
-        placeholder="Enter ZIP code"
-        value={zipcode}
-        onChange={handleInputChange}
-      />
-      <button onClick={weatherApp}>Get Weather</button>
+    <div className="container">
+      <h1 className="weather-title">What's the weather</h1>
+
+      <div className="center-content">
+        <input
+          className="input-size"
+          type="text"
+          placeholder="Enter ZIP code"
+          value={zipcode}
+          onChange={handleInputChange}
+          pattern = "[0-9]"
+        />
+        <button className="button-size" onClick={weatherApp} disabled={isFetching}>
+          Get Weather
+        </button>
+      </div>
 
       {weatherData && (
         <div>
